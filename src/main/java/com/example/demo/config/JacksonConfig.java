@@ -1,5 +1,6 @@
 package com.example.demo.config;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -33,22 +34,22 @@ public class JacksonConfig {
     @Primary
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
-        
+
         // 🔑 Record 지원을 위한 핵심 모듈
         mapper.registerModule(new ParameterNamesModule());
-        
+
         // Java 8+ 시간 API 지원
         mapper.registerModule(new JavaTimeModule());
-        
+
         // 날짜를 타임스탬프가 아닌 ISO 8601 형식으로 직렬화
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        
-        // 알 수 없는 속성 무시 (선택사항)
-        // mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        
+
+        // 알 수 없는 속성 무시 (Record 직렬화/역직렬화 라운드트립을 위해 필요)
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
         return mapper;
     }
-    
+
     /**
      * Record 지원 여부를 확인하는 유틸리티 메서드
      * 

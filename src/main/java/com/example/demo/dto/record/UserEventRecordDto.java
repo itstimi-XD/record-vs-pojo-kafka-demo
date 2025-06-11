@@ -32,7 +32,7 @@ public record UserEventRecordDto(
     LocalDateTime timestamp,
     Map<String, Object> metadata
 ) {
-    
+
     /**
      * Record에서도 생성자 검증 로직을 추가할 수 있습니다.
      * 이는 compact constructor라고 불립니다.
@@ -48,41 +48,45 @@ public record UserEventRecordDto(
         if (timestamp == null) {
             throw new IllegalArgumentException("timestamp cannot be null");
         }
-        
+
         // 정규화 (필요시)
         userId = userId.trim();
         eventType = eventType.trim().toUpperCase();
     }
-    
+
     /**
      * 편의 메서드: 현재 시간으로 이벤트 생성
      */
     public static UserEventRecordDto createNow(String userId, String eventType, Map<String, Object> metadata) {
         return new UserEventRecordDto(userId, eventType, LocalDateTime.now(), metadata);
     }
-    
+
     /**
      * 편의 메서드: 메타데이터 없이 이벤트 생성
      */
     public static UserEventRecordDto createSimple(String userId, String eventType) {
         return new UserEventRecordDto(userId, eventType, LocalDateTime.now(), Map.of());
     }
-    
+
     /**
      * 비즈니스 로직 메서드도 추가 가능
      */
     public boolean isLoginEvent() {
         return "LOGIN".equals(eventType);
     }
-    
+
     public boolean isLogoutEvent() {
         return "LOGOUT".equals(eventType);
     }
-    
+
     /**
      * 메타데이터에서 특정 값 추출
      */
     public String getMetadataValue(String key) {
-        return metadata != null ? String.valueOf(metadata.get(key)) : null;
+        if (metadata == null || !metadata.containsKey(key)) {
+            return null;
+        }
+        Object value = metadata.get(key);
+        return value != null ? String.valueOf(value) : null;
     }
 }
