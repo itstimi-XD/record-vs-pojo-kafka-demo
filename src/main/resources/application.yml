@@ -1,0 +1,52 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: record-vs-pojo-kafka-demo
+  
+  kafka:
+    bootstrap-servers: localhost:9092
+    
+    # Producer 설정
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        # JSON 직렬화 설정
+        spring.json.add.type.headers: false
+        spring.json.trusted.packages: "com.example.demo.dto"
+    
+    # Consumer 설정
+    consumer:
+      group-id: demo-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        # JSON 역직렬화 설정
+        spring.json.trusted.packages: "com.example.demo.dto"
+        spring.json.use.type.headers: false
+        spring.json.value.default.type: "com.example.demo.dto.pojo.UserEventPojoDto"
+
+# 로깅 설정
+logging:
+  level:
+    com.example.demo: DEBUG
+    org.springframework.kafka: INFO
+    org.apache.kafka: WARN
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+# 커스텀 설정
+demo:
+  kafka:
+    topics:
+      record-events: "record-events"
+      pojo-events: "pojo-events"
+      comparison-events: "comparison-events"
+    
+    # 성능 테스트 설정
+    performance:
+      test-iterations: 10000
+      warmup-iterations: 1000
